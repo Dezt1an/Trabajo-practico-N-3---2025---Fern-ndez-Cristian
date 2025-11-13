@@ -3,11 +3,13 @@ import { body } from 'express-validator';
 import {
   registrarUsuario,
   loginUsuario,
+  obtenerPerfil,
 } from '../controllers/usuarioController.js';
+
+import { protegerRuta } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-// POST /api/usuarios/registrar
 router.post(
   '/registrar',
   [
@@ -20,7 +22,6 @@ router.post(
   registrarUsuario
 );
 
-// POST /api/usuarios/login
 router.post(
   '/login',
   [
@@ -29,5 +30,8 @@ router.post(
   ],
   loginUsuario
 );
+
+
+router.get('/perfil', protegerRuta, obtenerPerfil);
 
 export default router;

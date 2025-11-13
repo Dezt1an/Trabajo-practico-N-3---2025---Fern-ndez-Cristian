@@ -106,3 +106,12 @@ export const loginUsuario = async (req, res) => {
     }
   }
 };
+
+export const obtenerPerfil = (req, res) => {
+  const usuario = req.user;
+  res.json({
+    id: usuario.id,
+    nombre: usuario.nombre,
+    email: usuario.email,
+  });
+};
