@@ -1,16 +1,42 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-// (Asegúrate de importar Alerta si lo añades aquí)
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthProvider.jsx';
+import Alerta from '../components/Alerta.jsx';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [contraseña, setContraseña] = useState('');
-  // (Aquí iría el state de Alerta y el handleSubmit para conectar a la API)
+  const [alerta, setAlerta] = useState({});
 
-  const handleSubmit = (e) => {
+  const { guardarAuth } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Iniciando sesión...');
+
+    if ([email, contraseña].includes('')) {
+      setAlerta({ msg: 'Todos los campos son obligatorios', error: true });
+      return;
+    }
+
+    setAlerta({});
+
+    try {
+      const url = 'http://localhost:4000/api/usuarios/login';
+      const { data } = await axios.post(url, { email, contraseña });
+
+      guardarAuth(data);
+      navigate('/admin');
+    } catch (error) {
+      setAlerta({
+        msg: error.response.data.msg,
+        error: true,
+      });
+    }
   };
+
+  const { msg } = alerta;
 
   return (
     <div className="md:w-2/3 lg:w-2/5 mx-auto">
@@ -21,7 +47,7 @@ const Login = () => {
         Administra tus vehículos, conductores y viajes
       </p>
 
-      {/* Aquí iría {msg && <Alerta ... />} */}
+      {msg && <Alerta alerta={alerta} />}
 
       <form
         className="mt-10 bg-white shadow-md rounded-lg p-8"
