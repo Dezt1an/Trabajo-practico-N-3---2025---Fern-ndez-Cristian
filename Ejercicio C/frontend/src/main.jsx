@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import AuthProvider from './context/AuthProvider.jsx';
 import Vehiculos from './pages/Vehiculos.jsx';
 import Conductores from './pages/Conductores.jsx';
+import Viajes from './pages/Viajes.jsx';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: 'conductores',
         element: <Conductores />,
+      },
+      {
+        path: 'viajes',
+        element: <Viajes />,
       },
     ],
   },
