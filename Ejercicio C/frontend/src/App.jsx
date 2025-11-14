@@ -2,10 +2,11 @@ import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
-    <main>
-      <h1>Gestión de Vehículos</h1>
-      <Outlet />
-    </main>
+    <div className="bg-gray-100 min-h-screen">
+      <main className="container mx-auto py-10 md:py-20">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 
