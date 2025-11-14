@@ -8,6 +8,7 @@ import passport from 'passport';
 import configurarPassport from './middleware/passport.js';
 import vehiculoRoutes from './routes/vehiculoRoutes.js';
 import conductorRoutes from './routes/conductorRoutes.js';
+import viajeRoutes from './routes/viajeRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ configurarPassport(passport);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/conductores', conductorRoutes);
+app.use('/api/viajes', viajeRoutes);
 
 const PORT = process.env.PORT || 4000;
 
