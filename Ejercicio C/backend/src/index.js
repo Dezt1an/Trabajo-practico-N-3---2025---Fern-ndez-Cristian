@@ -2,11 +2,11 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { conectarDB } from './config/db.js';
+
 import usuarioRoutes from './routes/usuarioRoutes.js';
-
 import passport from 'passport';
-
 import configurarPassport from './middleware/passport.js';
+import vehiculoRoutes from './routes/vehiculoRoutes.js';
 
 dotenv.config();
 
@@ -20,6 +20,8 @@ app.use(passport.initialize());
 configurarPassport(passport);
 
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/vehiculos', vehiculoRoutes);
+
 
 const PORT = process.env.PORT || 4000;
 
