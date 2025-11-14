@@ -7,15 +7,13 @@ import FormularioVehiculo from '../components/FormularioVehiculo.jsx';
 const Vehiculos = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [alerta, setAlerta] = useState({});
+  const [vehiculoEditar, setVehiculoEditar] = useState({});
 
   const { auth } = useAuth();
 
   useEffect(() => {
     const obtenerVehiculos = async () => {
-      if (!auth.token) {
-        setAlerta({ msg: 'Error de autenticación', error: true });
-        return;
-      }
+      if (!auth.token) return;
       const config = {
         headers: {
           'Content-Type': 'application/json',
@@ -36,6 +34,34 @@ const Vehiculos = () => {
     obtenerVehiculos();
   }, [auth]);
 
+  const handleEliminar = async (id) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este vehículo?')) {
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`,
+        },
+      };
+      const url = `http://localhost:4000/api/vehiculos/${id}`;
+      await axios.delete(url, config);
+
+      const vehiculosActualizados = vehiculos.filter((v) => v.id !== id);
+      setVehiculos(vehiculosActualizados);
+
+      setAlerta({ msg: 'Vehículo eliminado correctamente', error: false });
+      setTimeout(() => setAlerta({}), 3000);
+    } catch (error) {
+      setAlerta({
+        msg: error.response.data.msg || 'Error al eliminar',
+        error: true,
+      });
+    }
+  };
+
   const { msg } = alerta;
 
   return (
@@ -44,6 +70,8 @@ const Vehiculos = () => {
         <FormularioVehiculo
           vehiculos={vehiculos}
           setVehiculos={setVehiculos}
+          vehiculoEditar={vehiculoEditar}
+          setVehiculoEditar={setVehiculoEditar}
         />
       </div>
 
@@ -55,9 +83,7 @@ const Vehiculos = () => {
           Administra tus vehículos existentes.
         </p>
 
-        {msg && <Alerta alerta={alerta} />}
-
-        <div className="bg-white shadow-md rounded-lg p-5 mt-10">
+        <div className="bg-white shadow-md rounded-lg p-5">
           {vehiculos.length > 0 ? (
             <ul className="divide-y divide-gray-200">
               {vehiculos.map((vehiculo) => (
@@ -80,12 +106,14 @@ const Vehiculos = () => {
                     <button
                       type="button"
                       className="py-2 px-6 bg-yellow-500 hover:bg-yellow-600 text-white font-bold uppercase rounded-lg"
+                      onClick={() => setVehiculoEditar(vehiculo)}
                     >
                       Editar
                     </button>
                     <button
                       type="button"
                       className="py-2 px-6 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-lg"
+                      onClick={() => handleEliminar(vehiculo.id)}
                     >
                       Eliminar
                     </button>
@@ -99,6 +127,11 @@ const Vehiculos = () => {
             </p>
           )}
         </div>
+        
+        <div className="mt-5">
+          {msg && <Alerta alerta={alerta} />}
+        </div>
+
       </div>
     </div>
   );

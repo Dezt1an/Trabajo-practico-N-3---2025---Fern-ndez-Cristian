@@ -1,18 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthProvider.jsx';
 import Alerta from './Alerta.jsx';
 import axios from 'axios';
 
-const FormularioVehiculo = ({ vehiculos, setVehiculos }) => {
+const FormularioVehiculo = ({
+  vehiculos,
+  setVehiculos,
+  vehiculoEditar,
+  setVehiculoEditar,
+}) => {
   const [marca, setMarca] = useState('');
   const [modelo, setModelo] = useState('');
   const [patente, setPatente] = useState('');
   const [año, setAño] = useState('');
   const [capacidad, setCapacidad] = useState('');
+  const [id, setId] = useState(null);
 
   const [alerta, setAlerta] = useState({});
 
   const { auth } = useAuth();
+
+  useEffect(() => {
+    if (vehiculoEditar?.id) {
+      setMarca(vehiculoEditar.marca);
+      setModelo(vehiculoEditar.modelo);
+      setPatente(vehiculoEditar.patente);
+      setAño(vehiculoEditar.año);
+      setCapacidad(vehiculoEditar.capacidad_carga);
+      setId(vehiculoEditar.id);
+    }
+  }, [vehiculoEditar]);
+
+  const limpiarFormulario = () => {
+    setMarca('');
+    setModelo('');
+    setPatente('');
+    setAño('');
+    setCapacidad('');
+    setId(null);
+    setVehiculoEditar({});
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +48,6 @@ const FormularioVehiculo = ({ vehiculos, setVehiculos }) => {
       setAlerta({ msg: 'Todos los campos son obligatorios', error: true });
       return;
     }
-
     setAlerta({});
 
     const config = {
@@ -31,36 +57,37 @@ const FormularioVehiculo = ({ vehiculos, setVehiculos }) => {
       },
     };
 
+    const vehiculoDatos = {
+      marca,
+      modelo,
+      patente,
+      año,
+      capacidad_carga: capacidad,
+    };
+
     try {
-      const url = 'http://localhost:4000/api/vehiculos';
-      const { data } = await axios.post(
-        url,
-        { marca, modelo, patente, año, capacidad_carga: capacidad },
-        config
-      );
+      if (id) {
+        const url = `http://localhost:4000/api/vehiculos/${id}`;
+        await axios.put(url, vehiculoDatos, config);
 
-      const nuevoVehiculo = {
-        id: data.id,
-        marca,
-        modelo,
-        patente,
-        año,
-        capacidad_carga: capacidad,
-      };
+        const vehiculosActualizados = vehiculos.map((v) =>
+          v.id === id ? { ...vehiculoDatos, id } : v
+        );
+        setVehiculos(vehiculosActualizados);
 
-      setVehiculos([nuevoVehiculo, ...vehiculos]);
+        setAlerta({ msg: 'Vehículo actualizado correctamente', error: false });
+      } else {
+        const url = 'http://localhost:4000/api/vehiculos';
+        const { data } = await axios.post(url, vehiculoDatos, config);
 
-      setAlerta({ msg: 'Vehículo guardado correctamente', error: false });
-      setMarca('');
-      setModelo('');
-      setPatente('');
-      setAño('');
-      setCapacidad('');
+        const nuevoVehiculo = { ...vehiculoDatos, id: data.id };
+        setVehiculos([nuevoVehiculo, ...vehiculos]);
 
-      setTimeout(() => {
-        setAlerta({});
-      }, 3000);
+        setAlerta({ msg: 'Vehículo guardado correctamente', error: false });
+      }
 
+      limpiarFormulario();
+      setTimeout(() => setAlerta({}), 3000);
     } catch (error) {
       setAlerta({
         msg: error.response.data.msg || 'Error al guardar',
@@ -73,9 +100,13 @@ const FormularioVehiculo = ({ vehiculos, setVehiculos }) => {
 
   return (
     <>
-      <h2 className="text-3xl font-black text-indigo-600">Añadir Vehículo</h2>
+      <h2 className="text-3xl font-black text-indigo-600">
+        {id ? 'Editar Vehículo' : 'Añadir Vehículo'}
+      </h2>
       <p className="text-xl text-gray-600 mt-4 mb-8">
-        Rellena el formulario
+        {id
+          ? 'Modifica los datos del vehículo'
+          : 'Rellena el formulario para añadir un nuevo vehículo'}
       </p>
 
       <form
@@ -169,14 +200,22 @@ const FormularioVehiculo = ({ vehiculos, setVehiculos }) => {
 
         <input
           type="submit"
-          value="Guardar Vehículo"
+          value={id ? 'Actualizar Vehículo' : 'Guardar Vehículo'}
           className="bg-indigo-600 w-full p-3 text-white uppercase font-bold rounded-md hover:bg-indigo-700 cursor-pointer transition-colors"
         />
+
+        {id && (
+          <button
+            type="button"
+            onClick={limpiarFormulario}
+            className="bg-gray-500 w-full p-3 mt-3 text-white uppercase font-bold rounded-md hover:bg-gray-600 cursor-pointer transition-colors"
+          >
+            Cancelar Edición
+          </button>
+        )}
       </form>
 
-      <div className="mt-5">
-        {msg && <Alerta alerta={alerta} />}
-      </div>
+      <div className="mt-5">{msg && <Alerta alerta={alerta} />}</div>
     </>
   );
 };
