@@ -2,6 +2,7 @@ import React from 'react';
 
 const Dashboard = () => {
   return (
+    // Las clases p-10 ya vienen del layout RutaProtegida
     <div>
       <h2 className="text-5xl font-black text-indigo-600">
         ¡Bienvenido!

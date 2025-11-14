@@ -25,7 +25,6 @@ const Login = () => {
     try {
       const url = 'http://localhost:4000/api/usuarios/login';
       const { data } = await axios.post(url, { email, contraseña });
-
       guardarAuth(data);
       navigate('/admin');
     } catch (error) {
@@ -43,7 +42,7 @@ const Login = () => {
       <h1 className="text-4xl font-black text-center text-indigo-600">
         Iniciar Sesión
       </h1>
-      <p className="text-lg text-center mt-4">
+      <p className="text-xl text-center text-gray-600 mt-4">
         Administra tus vehículos, conductores y viajes
       </p>
 

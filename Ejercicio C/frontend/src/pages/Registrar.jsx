@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Alerta from '../components/Alerta.jsx';
 
@@ -9,6 +9,8 @@ const Registrar = () => {
   const [contraseña, setContraseña] = useState('');
   const [repetirContraseña, setRepetirContraseña] = useState('');
   const [alerta, setAlerta] = useState({});
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,13 +36,17 @@ const Registrar = () => {
       const url = 'http://localhost:4000/api/usuarios/registrar';
       await axios.post(url, { nombre, email, contraseña });
       setAlerta({
-        msg: 'Usuario creado correctamente',
+        msg: 'Usuario creado correctamente, redirigiendo al Login...',
         error: false,
       });
       setNombre('');
       setEmail('');
       setContraseña('');
       setRepetirContraseña('');
+      setTimeout(() => {
+        setAlerta({});
+        navigate('/');
+      }, 3000);
     } catch (error) {
       setAlerta({
         msg: error.response.data.msg,
@@ -56,7 +62,8 @@ const Registrar = () => {
       <h1 className="text-4xl font-black text-center text-indigo-600">
         Crea tu Cuenta
       </h1>
-      <p className="text-lg text-center mt-4">
+      
+      <p className="text-xl text-center text-gray-600 mt-4">
         Completa el formulario para registrarte
       </p>
 

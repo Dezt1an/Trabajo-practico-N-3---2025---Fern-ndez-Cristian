@@ -12,7 +12,6 @@ const AuthProvider = ({ children }) => {
       setCargando(false);
       return;
     }
-
     setAuth({ token });
     setCargando(false);
   }, []);
@@ -22,12 +21,18 @@ const AuthProvider = ({ children }) => {
     setAuth(auth);
   };
 
+  const cerrarSesion = () => {
+    localStorage.removeItem('token_flota');
+    setAuth({});
+  };
+
   return (
     <AuthContext.Provider
       value={{
         auth,
         guardarAuth,
         cargando,
+        cerrarSesion,
       }}
     >
       {children}

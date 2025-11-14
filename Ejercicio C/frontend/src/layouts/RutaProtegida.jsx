@@ -1,5 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider.jsx';
+import Header from '../components/Header.jsx';
+import Sidebar from '../components/Sidebar.jsx';
 
 const RutaProtegida = () => {
   const { auth, cargando } = useAuth();
@@ -11,12 +13,15 @@ const RutaProtegida = () => {
   }
 
   return (
-    <main>
-      <h1 className="text-4xl font-bold text-indigo-600 p-10">
-        PANEL DE ADMINISTRACIÓN
-      </h1>
-      <Outlet />
-    </main>
+    <div className="bg-indigo-100 min-h-screen">
+      <Header />
+      <div className="md:flex min-h-screen">
+        <Sidebar />
+        <main className="flex-1 p-10">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
 
